@@ -26,6 +26,3 @@ for center in kmeans.cluster_centers_:
    print("\nCluster center:")
    for i in range(len(center)):
       print(index_to_field[i], center[i])
-
-# TOOD: visualise clusters
-# requires saving index to field mapping
