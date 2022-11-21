@@ -54,7 +54,7 @@ def get_data():
                 .filter(ModelEntity.processorId == ProcessorEntity.id)
                 .filter(ModelEntity.graphicsId == GraphicsEntity.id)
                 .filter(ModelEntity.screenId == ScreenEntity.id)
-                ).limit(1000).all():
+                ).all():
         Y.append(row.OfferEntity.offerPrice // 1000 * 1000)
         new_row = {}
         for table, fields in NUMBER.items():
@@ -71,8 +71,10 @@ def get_data():
                 new_row[field] = value or 0
         for table, fields in CATEGORICAL.items():
             for field in fields:
-                new_row[field] = key_to_classes(
-                    field, getattr(row, table), fields_classes)
+                # collect classe
+                target = getattr(row, table)
+                new_row[field] = getattr(target, field)
+                key_to_classes(field, target, fields_classes)
         X_pre.append(new_row)
 
     X = []
@@ -85,7 +87,7 @@ def get_data():
         for table, fields in CATEGORICAL.items():
             for field in fields:
                 new_row.extend([1 if row[field] == _class else 0
-                                for _class in range(len(fields_classes[field]))])
+                                for _class in fields_classes[field]])
         X.append(new_row)
 
     # cleanup some memory
