@@ -18,15 +18,24 @@ def key_to_classes(key, row, fields_classes: defaultdict[list]):
         classes.append(value)
         return len(classes)-1
 
-if __name__ == "__main__":
+def get_data():
     engine = create_engine(DATABASE_URL)
     engine.connect()
     Session = sessionmaker(bind=engine)
     session = Session()
 
     fields_classes = defaultdict(list)
+
+    X = []
+    Y = []
     
-    for offer, model in session.query(OfferEntity, ModelEntity).limit(10).all():
-        print(offer.offerPrice, model.ramAmount, model.color, key_to_classes('color', model, fields_classes))
+    for offer, model in session.query(OfferEntity, ModelEntity).filter(OfferEntity.modelId==ModelEntity.id).limit(1000).all():
+        Y.append(offer.offerPrice // 1000 * 1000)
+        X.append([model.ramAmount, key_to_classes('color', model, fields_classes)])
 
     session.close()
+
+    return (X, Y)
+
+if __name__ == "__main__":
+    print(get_data())
