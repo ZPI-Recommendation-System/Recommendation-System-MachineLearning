@@ -18,6 +18,13 @@ def key_to_classes(key, row, fields_classes: defaultdict[list]):
         classes.append(value)
         return len(classes)-1
 
+NUMBER = {"ModelEntity" : ["ramAmount", "driveStorage", "weight", "ramNumberOfFreeSlots",
+"ramMaxAmount", "hddSpeed"], "BenchmarkEntity":["benchmark"], "ProcessorEntity": ["cores", "frequency"],
+"ScreenEntity":["refreshRate", "diagonalScreenInches"]}
+CATEGORICAL = {"ModelEntity" : ["color", "ramType", "driveType"],
+"ScreenEntity":["screenFinish"], "ScreenEntity":["touchScreen"]
+}
+
 def get_data():
     engine = create_engine(DATABASE_URL)
     engine.connect()
@@ -26,12 +33,37 @@ def get_data():
 
     fields_classes = defaultdict(list)
 
-    X = []
+    X_pre = []
     Y = []
     
-    for offer, model in session.query(OfferEntity, ModelEntity).filter(OfferEntity.modelId==ModelEntity.id).limit(1000).all():
-        Y.append(offer.offerPrice // 1000 * 1000)
-        X.append([model.ramAmount, key_to_classes('color', model, fields_classes)])
+    for row in (session.query(OfferEntity, ModelEntity, ProcessorEntity,BenchmarkEntity,ScreenEntity)
+    .filter(OfferEntity.modelId==ModelEntity.id)
+    .filter(ModelEntity.processorId==ProcessorEntity.id)
+    .filter(ProcessorEntity.benchmarkId==BenchmarkEntity.id)
+    .filter(ModelEntity.screenId==ScreenEntity.id)
+    ).limit(1000).all():
+        Y.append(row.OfferEntity.offerPrice // 1000 * 1000)
+        new_row = {}
+        for table, fields in NUMBER.items():
+            for field in fields:
+                new_row[field] = getattr(getattr(row, table), field) or 0
+        for table, fields in CATEGORICAL.items():
+            for field in fields:
+                new_row[field] = key_to_classes(field, getattr(row, table), fields_classes)
+        X_pre.append(new_row)
+
+    X = []
+    for row in X_pre:
+        new_row = []
+        for table, fields in NUMBER.items():
+            for field in fields:
+                new_row.append(row[field])
+        
+        for table, fields in CATEGORICAL.items():
+            for field in fields:
+                new_row.extend([1 if row[field]==_class else 0 
+                for _class in range(len(fields_classes[field]))])
+        X.append(new_row)
 
     session.close()
 
