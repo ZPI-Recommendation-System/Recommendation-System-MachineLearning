@@ -5,6 +5,8 @@ from sqlalchemy.orm import sessionmaker
 from db.entities import *
 import pandas as pd
 from collections import defaultdict
+from fields import NUMBER, CATEGORICAL
+import pickle
 
 DATABASE_URL = 'postgresql://backend:backend123@zpi.zgrate.ovh:5035/recommendation-system'
 
@@ -19,23 +21,6 @@ def key_to_classes(key, row, fields_classes: defaultdict[list]):
         classes.append(value)
         return len(classes)-1
 
-
-NUMBER = {
-    "ModelEntity": 
-        ["ramAmount", "driveStorage", "weight", "ramNumberOfFreeSlots", "ramMaxAmount", "hddSpeed"], 
-    "ScreenEntity": ["refreshRate", "diagonalScreenInches"],
-    "ProcessorEntity": ["cores", "frequency"],
-    ("ProcessorEntity", "benchmark_entity"): ["benchmark"],
-    ("GraphicsEntity", "benchmark_entity"): ["benchmark"],
-}
-CATEGORICAL = {
-    "ModelEntity": ["color", "ramType", "driveType"],
-    "GraphicsEntity": ["graphicsCardVRam"],
-    "ScreenEntity": ["screenFinish"], 
-    "ScreenEntity": ["touchScreen"],
-}
-
-
 def get_data():
     engine = create_engine(DATABASE_URL)
     engine.connect()
@@ -43,6 +28,7 @@ def get_data():
     session = Session()
 
     fields_classes = defaultdict(list)
+    index_to_field = {}
 
     X_pre = []
     Y = []
@@ -82,10 +68,13 @@ def get_data():
         new_row = []
         for table, fields in NUMBER.items():
             for field in fields:
+                index_to_field[len(new_row)] = field
                 new_row.append(row[field])
 
         for table, fields in CATEGORICAL.items():
             for field in fields:
+                for i in range(len(fields_classes[field])):
+                    index_to_field[len(new_row)+i] = field
                 new_row.extend([1 if row[field] == _class else 0
                                 for _class in fields_classes[field]])
         X.append(new_row)
@@ -94,6 +83,10 @@ def get_data():
     del X_pre
 
     session.close()
+
+    
+    with open("index_to_field.bin", "wb") as f:
+      pickle.dump(index_to_field, f)
 
     print("Returning data")
 
