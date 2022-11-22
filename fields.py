@@ -5,10 +5,11 @@ NUMBER = {
     "ProcessorEntity": ["cores", "frequency"],
     ("ProcessorEntity", "benchmark_entity"): ["benchmark"],
     ("GraphicsEntity", "benchmark_entity"): ["benchmark"],
+    "GraphicsEntity": ["graphicsCardVRam"],
 }
 CATEGORICAL = {
-    "ModelEntity": ["color", "ramType", "driveType"],
-    "GraphicsEntity": ["graphicsCardVRam"],
+    "ModelEntity": ["ramType", "driveType"],
     "ScreenEntity": ["screenFinish"], 
-    "ScreenEntity": ["touchScreen"],
+    # touch screen is False for all laptops for some reason
+    # "ScreenEntity": ["touchScreen"],
 }

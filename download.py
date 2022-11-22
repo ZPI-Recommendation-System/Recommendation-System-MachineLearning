@@ -10,6 +10,11 @@ import pickle
 
 DATABASE_URL = 'postgresql://backend:backend123@zpi.zgrate.ovh:5035/recommendation-system'
 
+def force_float(value):
+    try:
+        return float(value)
+    except:
+        return -1
 
 def key_to_classes(key, row, fields_classes: defaultdict[list]):
     classes = fields_classes[key]
@@ -54,7 +59,7 @@ def get_data():
                     value = getattr(target, field)
                 else:
                     value = None
-                new_row[field] = value or 0
+                new_row[field] = force_float(value)
         for table, fields in CATEGORICAL.items():
             for field in fields:
                 # collect classe
@@ -94,4 +99,4 @@ def get_data():
 
 
 if __name__ == "__main__":
-    print(get_data())
+    print(get_data()[2])
