@@ -42,6 +42,11 @@ def get_data():
     print("Starting the query")
 
     for row in all_laptops(session).all():
+        # skip macbooks for now
+        name = row.ModelEntity.name.lower()
+        if "macbook" in name or "apple" in name:
+            continue
+
         Y.append(row.OfferEntity.offerPrice // 1000 * 1000)
         new_row = {}
         for table, fields in NUMBER.items():

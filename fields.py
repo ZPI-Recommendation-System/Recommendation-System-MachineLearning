@@ -1,6 +1,9 @@
 NUMBER = {
     "ModelEntity": 
-        ["ramAmount", "driveStorage", "weight", "ramNumberOfFreeSlots", "ramMaxAmount", "hddSpeed"], 
+        ["ramAmount", "driveStorage", 
+        "weight", 
+        # "ramNumberOfFreeSlots", "ramMaxAmount", 
+        "hddSpeed"], 
     "ScreenEntity": ["refreshRate", "diagonalScreenInches"],
     "ProcessorEntity": ["cores", "frequency"],
     ("ProcessorEntity", "benchmark_entity"): ["benchmark"],
