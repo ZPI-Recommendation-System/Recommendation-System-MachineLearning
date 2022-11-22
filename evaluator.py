@@ -1,6 +1,7 @@
 import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from db.entities import OfferEntity
 
 from queries import all_laptops
 from to_x import to_x
@@ -54,8 +55,15 @@ def process():
             new_row[field] = value
 
       X = to_x([new_row], index_to_field, fields_classes)
-      print(model.predict(X))
 
+      predictedPrice = model.predict(X)[0]
+      print(predictedPrice)
+
+      print("Posting offer")
+      newOffer = OfferEntity(offerName="ML", offerURL="ML", offerPrice=predictedPrice, modelId=row.ModelEntity.id)
+      session.add(newOffer)   
+
+    session.commit()
     session.close()
 
 
