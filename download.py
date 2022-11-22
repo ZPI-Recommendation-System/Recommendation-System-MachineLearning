@@ -2,7 +2,8 @@ import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from db.entities import *
+from queries import all_laptops
+from to_x import to_x
 import pandas as pd
 from collections import defaultdict
 from fields import NUMBER, CATEGORICAL
@@ -40,12 +41,7 @@ def get_data():
     
     print("Starting the query")
 
-    for row in (session.query(OfferEntity, ModelEntity, ProcessorEntity, GraphicsEntity, ScreenEntity)
-                .filter(OfferEntity.modelId == ModelEntity.id)
-                .filter(ModelEntity.processorId == ProcessorEntity.id)
-                .filter(ModelEntity.graphicsId == GraphicsEntity.id)
-                .filter(ModelEntity.screenId == ScreenEntity.id)
-                ).all():
+    for row in all_laptops(session).all():
         Y.append(row.OfferEntity.offerPrice // 1000 * 1000)
         new_row = {}
         for table, fields in NUMBER.items():
@@ -68,21 +64,8 @@ def get_data():
                 key_to_classes(field, target, fields_classes)
         X_pre.append(new_row)
 
-    X = []
-    for row in X_pre:
-        new_row = []
-        for table, fields in NUMBER.items():
-            for field in fields:
-                index_to_field[len(new_row)] = field
-                new_row.append(row[field])
-
-        for table, fields in CATEGORICAL.items():
-            for field in fields:
-                for i in range(len(fields_classes[field])):
-                    index_to_field[len(new_row)+i] = field
-                new_row.extend([1 if row[field] == _class else 0
-                                for _class in fields_classes[field]])
-        X.append(new_row)
+    print("Converting to X")
+    X = to_x(X_pre, index_to_field, fields_classes)
 
     # cleanup some memory
     del X_pre
@@ -90,6 +73,8 @@ def get_data():
     session.close()
 
     
+    print("Saving index_to_field")    
+
     with open("index_to_field.bin", "wb") as f:
       pickle.dump(index_to_field, f)
 
