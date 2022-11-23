@@ -1,6 +1,7 @@
 from sklearn.model_selection import train_test_split
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import MultinomialNB, ComplementNB
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.pipeline import Pipeline
 
 import pandas as pd
 import pickle
@@ -42,7 +43,7 @@ X_train, X_test, y_train, y_test = train_test_split(new_X, new_Y, test_size=0.4,
 print("Logistic regression")
 
 # https://blog.bigml.com/2016/09/26/predicting-airbnb-prices-with-logistic-regression/
-classifier = LogisticRegression(multi_class='multinomial', solver='sag', max_iter=100_000)
+classifier = Pipeline([('Normalizing',MinMaxScaler()),('NaiveBayes',MultinomialNB())]) # ComplementNB
 classifier.fit(X_train, y_train)
 score = classifier.score(X_test, y_test)
 
