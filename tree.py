@@ -21,14 +21,17 @@ else:
 
 X, Y, fields_classes = data
 
+
+X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.4, random_state=0)
+
 new_X = []
 new_Y = []
-count = 200
+count = 150
 
 # similar counts for classes 
-for price in set(Y):
+for price in set(y_train):
    counter = 0
-   for x, y in zip(X, Y):
+   for x, y in zip(X_train, y_train):
       if y == price and price != 10000.0:
          new_X.append(x)
          new_Y.append(y)
@@ -38,13 +41,11 @@ for price in set(Y):
    if counter < count:
       print("not enough data for price", price, counter)
 
-X_train, X_test, y_train, y_test = train_test_split(new_X, new_Y, test_size=0.4, random_state=0)
-
 print("RandomForestClassifier")
 
 classifier =  RandomForestClassifier(random_state=0)
 # classifier =  Pipeline([('Normalizing',MinMaxScaler()),('RandomForestClassifier',RandomForestClassifier(random_state=0))])
-classifier.fit(X_train, y_train)
+classifier.fit(new_X, new_Y)
 score = classifier.score(X_test, y_test)
 
 print("Accuracy:", score)
