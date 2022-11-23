@@ -2,6 +2,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import Pipeline
+from math import ceil
+from imblearn.over_sampling import SMOTE, ADASYN
+from imblearn.under_sampling import RandomUnderSampler, ClusterCentroids, NearMiss
 
 import pandas as pd
 import pickle
@@ -21,25 +24,12 @@ else:
 
 X, Y, fields_classes = data
 
+l = [(x, y) for x, y in zip(X, Y) if y!=10000.0]
+X, Y = list(zip(*l))
 
 X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.4, random_state=0)
 
-new_X = []
-new_Y = []
-count = 150
-
-# similar counts for classes 
-for price in set(y_train):
-   counter = 0
-   for x, y in zip(X_train, y_train):
-      if y == price and price != 10000.0:
-         new_X.append(x)
-         new_Y.append(y)
-         counter += 1
-         if counter >= count:
-            break
-   if counter < count:
-      print("not enough data for price", price, counter)
+new_X, new_Y = ADASYN(sampling_strategy='minority').fit_resample(X_train, y_train)
 
 print("RandomForestClassifier")
 
