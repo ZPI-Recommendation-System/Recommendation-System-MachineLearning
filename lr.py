@@ -2,6 +2,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
 
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+
+from imblearn.over_sampling import SMOTE, ADASYN
+
 import pandas as pd
 import pickle
 
@@ -20,30 +25,19 @@ else:
 
 X, Y, fields_classes = data
 
-new_X = []
-new_Y = []
-count = 200
+# remove one laptop with price of 10_000
+l = [(x, y) for x, y in zip(X, Y) if y!=10000.0]
+X, Y = list(zip(*l))
 
-# similar counts for classes 
-for price in set(Y):
-   counter = 0
-   for x, y in zip(X, Y):
-      if y == price and price != 10000.0:
-         new_X.append(x)
-         new_Y.append(y)
-         counter += 1
-         if counter >= count:
-            break
-   if counter < count:
-      print("not enough data for price", price, counter)
+X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.4, random_state=0)
 
-X_train, X_test, y_train, y_test = train_test_split(new_X, new_Y, test_size=0.4, random_state=0)
+new_X, new_Y = ADASYN(sampling_strategy='minority').fit_resample(X_train, y_train)
 
 print("Logistic regression")
 
 # https://blog.bigml.com/2016/09/26/predicting-airbnb-prices-with-logistic-regression/
-classifier = LogisticRegression(multi_class='multinomial', solver='sag', max_iter=100_000)
-classifier.fit(X_train, y_train)
+classifier = make_pipeline(StandardScaler(), LogisticRegression(multi_class='multinomial', solver='sag', max_iter=100_000))
+classifier.fit(new_X, new_Y)
 score = classifier.score(X_test, y_test)
 
 print("Accuracy:", score)

@@ -24,6 +24,7 @@ else:
 
 X, Y, fields_classes = data
 
+# remove one laptop with price of 10_000
 l = [(x, y) for x, y in zip(X, Y) if y!=10000.0]
 X, Y = list(zip(*l))
 
@@ -33,7 +34,7 @@ new_X, new_Y = ADASYN(sampling_strategy='minority').fit_resample(X_train, y_trai
 
 print("RandomForestClassifier")
 
-classifier =  RandomForestClassifier(random_state=0)
+classifier = RandomForestClassifier(random_state=0)
 # classifier =  Pipeline([('Normalizing',MinMaxScaler()),('RandomForestClassifier',RandomForestClassifier(random_state=0))])
 classifier.fit(new_X, new_Y)
 score = classifier.score(X_test, y_test)
