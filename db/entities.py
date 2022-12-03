@@ -80,15 +80,17 @@ class ModelEntity(Base):
     length = Column(Float(53))
     depth = Column(Float(53))
     weight = Column(Float(53))
-    ramAmount = Column(Float(53))
+    ramAmount = Column(Float(53), nullable=False)
     ramFrequency = Column(Integer)
     ramNumberOfSlots = Column(Integer)
     ramNumberOfFreeSlots = Column(Integer)
     ramType = Column(String)
     ramMaxAmount = Column(Integer)
-    driveStorage = Column(Integer)
+    driveStorage = Column(Integer, nullable=False)
     driveType = Column(String)
     hddSpeed = Column(Integer)
+    price = Column(Float(53), nullable=False)
+    priceSource = Column(String, nullable=False, server_default=text("'unknown'::character varying"))
     processorId = Column(ForeignKey('processor_entity.id'))
     screenId = Column(ForeignKey('screen_entity.id'))
     graphicsId = Column(ForeignKey('graphics_entity.id'))
@@ -155,23 +157,11 @@ class MultimediaEntity(Base):
     multimediaName = Column(String, primary_key=True)
 
 
-class OfferEntity(Base):
-    __tablename__ = 'offer_entity'
-
-    id = Column(Integer, primary_key=True, server_default=text("nextval('offer_entity_id_seq'::regclass)"))
-    offerName = Column(String, nullable=False)
-    offerURL = Column(String, nullable=False)
-    offerPrice = Column(Float(53))
-    modelId = Column(ForeignKey('model_entity.id'))
-
-    model_entity = relationship('ModelEntity')
-
-
 class ProcessorEntity(Base):
     __tablename__ = 'processor_entity'
 
     id = Column(Integer, primary_key=True, server_default=text("nextval('processor_entity_id_seq'::regclass)"))
-    model = Column(String)
+    model = Column(String, nullable=False)
     series = Column(String)
     cores = Column(Integer)
     frequency = Column(Float(53))
@@ -184,7 +174,7 @@ class ScreenEntity(Base):
     __tablename__ = 'screen_entity'
 
     id = Column(Integer, primary_key=True, server_default=text("nextval('screen_entity_id_seq'::regclass)"))
-    diagonalScreenInches = Column(Float(53))
+    diagonalScreenInches = Column(Float(53), nullable=False)
     resolution = Column(String)
     screenFinish = Column(String)
     screenType = Column(String)

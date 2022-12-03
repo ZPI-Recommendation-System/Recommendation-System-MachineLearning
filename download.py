@@ -27,7 +27,7 @@ def key_to_classes(key, row, fields_classes: defaultdict[list]):
         classes.append(value)
         return len(classes)-1
 
-def get_data():
+def get_data(floor_price=True):
     engine = create_engine(DATABASE_URL)
     engine.connect()
     Session = sessionmaker(bind=engine)
@@ -42,12 +42,15 @@ def get_data():
     print("Starting the query")
 
     for row in all_laptops(session).all():
-        # skip macbooks for now
-        name = row.ModelEntity.name.lower()
-        if "macbook" in name or "apple" in name:
+        if row.ModelEntity.priceSource != 'allegro':
+            # skip laptops without scaped price
             continue
-
-        Y.append(row.OfferEntity.offerPrice // 1000 * 1000)
+        
+        price = row.ModelEntity.price
+        if floor_price:
+            price = price // 1000 * 1000
+        
+        Y.append(price)
         new_row = {}
         for table, fields in NUMBER.items():
             for field in fields:

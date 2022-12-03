@@ -1,5 +1,6 @@
 from sklearn.model_selection import train_test_split
 from math import ceil
+from imblearn.over_sampling import SMOTE, ADASYN
 import pickle
 
 import torch
@@ -16,7 +17,7 @@ DATA_FROM_DB = False
 if DATA_FROM_DB:
    from download import get_data
 
-   data = get_data(floor_price=False)
+   data = get_data()
    with open("data.bin", "wb") as f:
       pickle.dump(data, f)
 else:
@@ -31,8 +32,8 @@ l = [(x, y) for x, y in zip(X, Y) if y!=10000.0]
 X, Y = list(zip(*l))
 
 X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.4, random_state=0)
-y_test = [[y] for y in y_test]
-y_train = [[y] for y in y_train]
+
+X_train_balanced, Y_train_balanced = ADASYN(sampling_strategy='minority').fit_resample(X_train, y_train)
 
 class Net(nn.Module):
     def __init__(self, input_size, H1, H2, H3, output_size):
@@ -53,8 +54,13 @@ class Net(nn.Module):
 
 H1, H2, H3 = 500, 1000, 200
 
-X_train_tensor = torch.tensor(X_train, dtype=torch.float)
-Y_train_tensor = torch.tensor(y_train, dtype=torch.float)
+labels = list(range(1000, 11000, 1000))
+print("labels", labels)
+
+X_train_tensor = torch.tensor(X_train_balanced, dtype=torch.float)
+Y_train_to_classes = [[1 if y == label else 0 for label in labels]
+           for y in Y_train_balanced]
+Y_train_tensor = torch.tensor(Y_train_to_classes, dtype=torch.float)
 
 X_test_tensor = torch.tensor(X_test, dtype=torch.float)
 Y_test_tensor = torch.tensor(y_test, dtype=torch.float)
@@ -63,13 +69,12 @@ def calculate_accuracy(model):
     # Forward and backward passes
     with torch.no_grad():
         output = model.forward(X_test_tensor)
-    
-    # print("output:", output[0:3])
-    output_floored = output // 1000 * 1000
-    y_test_floored = Y_test_tensor // 1000 * 1000
-    # print("output_floored", output_floored[0:3])
-    # print("y_test_floored", y_test_floored[0:3])
-    accuracy = sum(y_test_floored == output_floored)/len(Y_test_tensor)
+
+    print("output:", output[0:3])
+    predicted_labels = torch.argmax(output, dim=1).apply_(lambda x: labels[x])
+    print("Y_test_tensor", Y_test_tensor[0:3])
+    print("predicted_labels", predicted_labels[0:3])
+    accuracy = sum(Y_test_tensor == predicted_labels)/len(Y_test_tensor)
     accuracy = accuracy.item()
     return accuracy
 
@@ -81,8 +86,8 @@ optimizer = torch.optim.Adam(model.parameters(), lr=1e-4 * 2)
 
 losses = []
 accuracies = []
-iterations = 10000
-iterations_to_accuracy = 50
+iterations = 10
+iterations_to_accuracy = 1
 iterations_to_save = iterations_to_accuracy
 
 for t in range(iterations):
