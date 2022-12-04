@@ -34,8 +34,8 @@ new_X, new_Y = ADASYN(sampling_strategy='minority').fit_resample(X_train, y_trai
 
 print("RandomForestClassifier")
 
-classifier = RandomForestClassifier(random_state=0)
-# classifier =  Pipeline([('Normalizing',MinMaxScaler()),('RandomForestClassifier',RandomForestClassifier(random_state=0))])
+# classifier = RandomForestClassifier(random_state=0)
+classifier =  Pipeline([('Normalizing',MinMaxScaler()),('RandomForestClassifier',RandomForestClassifier(random_state=0))])
 classifier.fit(new_X, new_Y)
 score = classifier.score(X_test, y_test)
 

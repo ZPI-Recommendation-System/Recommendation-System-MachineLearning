@@ -1,6 +1,6 @@
 # coding: utf-8
 from sqlalchemy import Boolean, Column, Float, ForeignKey, Integer, String, Table, text
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Mapped
 from sqlalchemy.ext.declarative import declarative_base
 
 
@@ -27,6 +27,8 @@ class CommunicationEntity(Base):
 
     model_entity = relationship('ModelEntity', secondary='model_entity_communications_communication_entity')
 
+    def __str__(self) -> str:
+        return self.communicationName
 
 class ConnectionEntity(Base):
     __tablename__ = 'connection_entity'
@@ -34,6 +36,9 @@ class ConnectionEntity(Base):
     connectionName = Column(String, primary_key=True)
 
     model_entity = relationship('ModelEntity', secondary='model_entity_connections_connection_entity')
+
+    def __str__(self) -> str:
+        return self.connectionName
 
 
 class ControlEntity(Base):
@@ -43,6 +48,9 @@ class ControlEntity(Base):
 
     model_entity = relationship('ModelEntity', secondary='model_entity_controls_control_entity')
 
+    def __repr__(self) -> str:
+        return self.controlName
+
 
 class DriveTypeEntity(Base):
     __tablename__ = 'drive_type_entity'
@@ -50,6 +58,9 @@ class DriveTypeEntity(Base):
     driveType = Column(String, primary_key=True)
 
     model_entity = relationship('ModelEntity', secondary='model_entity_drives_drive_type_entity')
+
+    def __str__(self) -> str:
+        return self.driveType
 
 
 class GraphicsEntity(Base):
@@ -63,6 +74,51 @@ class GraphicsEntity(Base):
 
     benchmark_entity = relationship('BenchmarkEntity')
 
+t_model_entity_connections_connection_entity = Table(
+    'model_entity_connections_connection_entity', metadata,
+    Column('modelEntityId', ForeignKey('model_entity.id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True),
+    Column('connectionEntityConnectionName', ForeignKey('connection_entity.connectionName', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True)
+)
+
+t_model_entity_communications_communication_entity = Table(
+    'model_entity_communications_communication_entity', metadata,
+    Column('modelEntityId', ForeignKey('model_entity.id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True),
+    Column('communicationEntityCommunicationName', ForeignKey('communication_entity.communicationName', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True)
+)
+
+t_model_entity_controls_control_entity = Table(
+    'model_entity_controls_control_entity', metadata,
+    Column('modelEntityId', ForeignKey('model_entity.id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True),
+    Column('controlEntityControlName', ForeignKey('control_entity.controlName', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True)
+)
+
+
+t_model_entity_drives_drive_type_entity = Table(
+    'model_entity_drives_drive_type_entity', metadata,
+    Column('modelEntityId', ForeignKey('model_entity.id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True),
+    Column('driveTypeEntityDriveType', ForeignKey('drive_type_entity.driveType', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True)
+)
+
+
+t_model_entity_images_model_img_entity = Table(
+    'model_entity_images_model_img_entity', metadata,
+    Column('modelEntityId', ForeignKey('model_entity.id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True),
+    Column('modelImgEntityId', ForeignKey('model_img_entity.id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True)
+)
+
+t_model_entity_multimedia_multimedia_entity = Table(
+    'model_entity_multimedia_multimedia_entity', metadata,
+    Column('modelEntityId', ForeignKey('model_entity.id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True),
+    Column('multimediaEntityMultimediaName', ForeignKey('multimedia_entity.multimediaName', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True)
+)
+
+class MultimediaEntity(Base):
+    __tablename__ = 'multimedia_entity'
+
+    multimediaName = Column(String, primary_key=True)
+
+    def __str__(self) -> str:
+        return self.multimediaName
 
 class ModelEntity(Base):
     __tablename__ = 'model_entity'
@@ -101,47 +157,12 @@ class ModelEntity(Base):
     multimedia_entity = relationship('MultimediaEntity', secondary='model_entity_multimedia_multimedia_entity')
     model_img_entity = relationship('ModelImgEntity', secondary='model_entity_images_model_img_entity')
 
+    connections: Mapped[list[ConnectionEntity]] = relationship("ConnectionEntity", secondary=t_model_entity_connections_connection_entity, viewonly=True)
+    communications: Mapped[list[CommunicationEntity]] = relationship("CommunicationEntity", secondary=t_model_entity_communications_communication_entity, viewonly=True)
+    # controls: Mapped[list[ControlEntity]] = relationship("ControlEntity", secondary=t_model_entity_controls_control_entity, viewonly=True)
+    # multimedia: Mapped[list[MultimediaEntity]] = relationship("MultimediaEntity", secondary=t_model_entity_multimedia_multimedia_entity, viewonly=True)
+    # drives: Mapped[list[DriveTypeEntity]] = relationship("DriveTypeEntity", secondary=t_model_entity_drives_drive_type_entity, viewonly=True)
 
-t_model_entity_communications_communication_entity = Table(
-    'model_entity_communications_communication_entity', metadata,
-    Column('modelEntityId', ForeignKey('model_entity.id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True),
-    Column('communicationEntityCommunicationName', ForeignKey('communication_entity.communicationName', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True)
-)
-
-
-t_model_entity_connections_connection_entity = Table(
-    'model_entity_connections_connection_entity', metadata,
-    Column('modelEntityId', ForeignKey('model_entity.id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True),
-    Column('connectionEntityConnectionName', ForeignKey('connection_entity.connectionName', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True)
-)
-
-
-t_model_entity_controls_control_entity = Table(
-    'model_entity_controls_control_entity', metadata,
-    Column('modelEntityId', ForeignKey('model_entity.id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True),
-    Column('controlEntityControlName', ForeignKey('control_entity.controlName', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True)
-)
-
-
-t_model_entity_drives_drive_type_entity = Table(
-    'model_entity_drives_drive_type_entity', metadata,
-    Column('modelEntityId', ForeignKey('model_entity.id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True),
-    Column('driveTypeEntityDriveType', ForeignKey('drive_type_entity.driveType', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True)
-)
-
-
-t_model_entity_images_model_img_entity = Table(
-    'model_entity_images_model_img_entity', metadata,
-    Column('modelEntityId', ForeignKey('model_entity.id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True),
-    Column('modelImgEntityId', ForeignKey('model_img_entity.id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True)
-)
-
-
-t_model_entity_multimedia_multimedia_entity = Table(
-    'model_entity_multimedia_multimedia_entity', metadata,
-    Column('modelEntityId', ForeignKey('model_entity.id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True),
-    Column('multimediaEntityMultimediaName', ForeignKey('multimedia_entity.multimediaName', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True, nullable=False, index=True)
-)
 
 
 class ModelImgEntity(Base):
@@ -151,10 +172,6 @@ class ModelImgEntity(Base):
     url = Column(String, nullable=False)
 
 
-class MultimediaEntity(Base):
-    __tablename__ = 'multimedia_entity'
-
-    multimediaName = Column(String, primary_key=True)
 
 
 class ProcessorEntity(Base):

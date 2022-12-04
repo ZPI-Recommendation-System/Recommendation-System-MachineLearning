@@ -2,7 +2,6 @@ import operator
 import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from db.entities import OfferEntity
 import numpy as np
 
 from queries import all_laptops

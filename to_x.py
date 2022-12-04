@@ -1,4 +1,4 @@
-from fields import NUMBER, CATEGORICAL
+from fields import NUMBER, CATEGORICAL, CATEGORICAL_MULTI
 
 def force_float(value):
     try:
@@ -20,6 +20,13 @@ def to_x(row_dict:dict, index_to_field:dict[int, str], fields_classes:dict[str, 
                 for i in range(len(fields_classes[field])):
                     index_to_field[len(new_row)+i] = field
                 new_row.extend([1 if row[field] == _class else 0
+                                for _class in fields_classes[field]])
+        
+        for table, fields in CATEGORICAL_MULTI.items():
+            for field in fields:
+                for i in range(len(fields_classes[field])):
+                    index_to_field[len(new_row)+i] = field
+                new_row.extend([1 if _class in row[field] else 0
                                 for _class in fields_classes[field]])
         X.append(new_row)
 

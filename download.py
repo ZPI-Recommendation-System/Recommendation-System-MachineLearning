@@ -6,7 +6,7 @@ from queries import all_laptops
 from to_x import to_x
 import pandas as pd
 from collections import defaultdict
-from fields import NUMBER, CATEGORICAL
+from fields import NUMBER, CATEGORICAL, CATEGORICAL_MULTI
 import pickle
 
 DATABASE_URL = 'postgresql://backend:backend123@zpi.zgrate.ovh:5035/recommendation-system'
@@ -17,9 +17,10 @@ def force_float(value):
     except:
         return -1
 
-def key_to_classes(key, row, fields_classes: defaultdict[list]):
+def key_to_classes(key, row, fields_classes: defaultdict[list], value: any = None):
     classes = fields_classes[key]
-    value = getattr(row, key)
+    if value is None:
+        value = getattr(row, key)
 
     if value in classes:
         return classes.index(value)
@@ -44,11 +45,12 @@ def get_data(floor_price=True):
     for row in all_laptops(session).all():
         if row.ModelEntity.priceSource != 'allegro':
             # skip laptops without scaped price
-            continue
+            continue        
         
         price = row.ModelEntity.price
         if floor_price:
-            price = price // 1000 * 1000
+            # round instead of floor should yield better results
+            price = round(price / 1000) * 1000
         
         Y.append(price)
         new_row = {}
@@ -66,10 +68,17 @@ def get_data(floor_price=True):
                 new_row[field] = force_float(value)
         for table, fields in CATEGORICAL.items():
             for field in fields:
-                # collect classe
+                # collect classes
                 target = getattr(row, table)
                 new_row[field] = getattr(target, field)
                 key_to_classes(field, target, fields_classes)
+        for table, fields in CATEGORICAL_MULTI.items():
+            for field in fields:
+                target = getattr(row, table)
+                value = [str(element) for element in getattr(target, field)]
+                new_row[field] = value
+                for element in value:
+                    key_to_classes(field, row, fields_classes, element)
         X_pre.append(new_row)
 
     print("Converting to X")

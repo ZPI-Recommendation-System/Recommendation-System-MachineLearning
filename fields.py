@@ -16,3 +16,12 @@ CATEGORICAL = {
     # touch screen is False for all laptops for some reason
     # "ScreenEntity": ["touchScreen"],
 }
+CATEGORICAL_MULTI = {
+    "ModelEntity": [
+        "connections", 
+        "communications", 
+        #"controls", 
+        #"multimedia", 
+        #"drives"
+    ],
+}
