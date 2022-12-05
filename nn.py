@@ -92,12 +92,12 @@ for t in range(iterations):
     print(t, loss.item())
     losses.append(loss.item())
 
-    if t!=0 and t % iterations_to_accuracy == 0:
+    if (t+1) % iterations_to_accuracy == 0:
         accuracy = calculate_accuracy(model)
         print("accuracy", accuracy)
         accuracies.append(accuracy)
 
-    if t!=0 and t % iterations_to_save == 0:    
+    if (t+1) % iterations_to_save == 0:    
         torch.save(model, f"models/model {t} accuracy {accuracy}.pt")
     
     if torch.isnan(loss):

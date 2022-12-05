@@ -73,12 +73,13 @@ def get_data(floor_price=True):
                 new_row[field] = getattr(target, field)
                 key_to_classes(field, target, fields_classes)
         for table, fields in CATEGORICAL_MULTI.items():
-            for field in fields:
+            for field, classes in fields.items():
                 target = getattr(row, table)
                 value = [str(element) for element in getattr(target, field)]
                 new_row[field] = value
                 for element in value:
-                    key_to_classes(field, row, fields_classes, element)
+                    if type(classes) != list or element in classes:
+                        key_to_classes(field, row, fields_classes, element)
         X_pre.append(new_row)
 
     print("Converting to X")

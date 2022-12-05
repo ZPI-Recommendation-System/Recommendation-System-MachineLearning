@@ -17,11 +17,30 @@ CATEGORICAL = {
     # "ScreenEntity": ["touchScreen"],
 }
 CATEGORICAL_MULTI = {
-    "ModelEntity": [
-        "connections", 
-        "communications", 
-        #"controls", 
-        #"multimedia", 
-        #"drives"
-    ],
+    "ModelEntity": {
+        "connections":[
+            # fields that are just different variants (e.g. USB),
+            # don't map directly into price (e.g. inne) 
+            # or have small counts were removed
+            "RJ-45",
+            "Thunderbolt",
+            "D-Sub (VGA)",
+            "mini DisplayPort",
+            "złącze dokowania",
+            "DisplayPort",
+            "slot na kartę SIM",
+        ], 
+        "communications":[
+            # same as above 
+            "LAN 10/100/1000 Mbps",
+            "LAN 10/100 Mbps",
+            "modem 4G (LTE)",
+            "Intel Wireless Display (WiDi)",
+            "NFC (Near Field Communication)",
+        ], 
+        # these aren't really meaningful 
+        #"controls":True, 
+        #"multimedia":True, 
+        #"drives":True
+    },
 }

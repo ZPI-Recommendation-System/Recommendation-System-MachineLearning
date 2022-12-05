@@ -26,6 +26,7 @@ def to_x(row_dict:dict, index_to_field:dict[int, str], fields_classes:dict[str, 
             for field in fields:
                 for i in range(len(fields_classes[field])):
                     index_to_field[len(new_row)+i] = field
+                # row[field] is a list of classes that the object belongs to
                 new_row.extend([1 if _class in row[field] else 0
                                 for _class in fields_classes[field]])
         X.append(new_row)

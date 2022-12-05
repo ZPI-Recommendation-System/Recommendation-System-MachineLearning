@@ -80,14 +80,15 @@ def calculate_accuracy(model):
 
 input_size, output_size = X_train_tensor.shape[1], Y_train_tensor.shape[1]
 
-model = Net(input_size, H1, H2, H3, output_size)
+# model = Net(input_size, H1, H2, H3, output_size)
+model = torch.load("models/model 9999 accuracy 0.5080482959747314.pt")
 criterion = nn.MSELoss(reduction='sum')
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-4 * 2)
 
 losses = []
 accuracies = []
-iterations = 10
-iterations_to_accuracy = 1
+iterations = 500_000
+iterations_to_accuracy = 500
 iterations_to_save = iterations_to_accuracy
 
 for t in range(iterations):
@@ -97,13 +98,13 @@ for t in range(iterations):
     print(t, loss.item())
     losses.append(loss.item())
 
-    if t!=0 and t % iterations_to_accuracy == 0:
+    if (t+1) % iterations_to_accuracy == 0:
         accuracy = calculate_accuracy(model)
         print("accuracy", accuracy)
         accuracies.append(accuracy)
 
-    if t!=0 and t % iterations_to_save == 0:    
-        torch.save(model, f"models/model {t} accuracy {accuracy}.pt")
+    if(t+1) % iterations_to_save == 0:    
+        torch.save(model, f"models/{t} acc {accuracy}.pt")
     
     if torch.isnan(loss):
         break
@@ -112,6 +113,8 @@ for t in range(iterations):
     loss.backward()
     optimizer.step()
 
+# ignore values from before 1000 for better display
+losses = losses[1000:]
 plt.plot(range(len(losses)), losses)
 plt.savefig("loss.png")
 
