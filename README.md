@@ -12,6 +12,8 @@ Then the model is used to set price for laptops without given price.
 pip install -r requirements.txt
 ```
 
+Packages are listed only for the two scripts described below.
+
 ## Learning 
 
 ```bash

@@ -1,12 +1,9 @@
 import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from db.entities import OfferEntity
 
 from queries import all_laptops
 from to_x import to_x
-import pandas as pd
-from collections import defaultdict
 from fields import NUMBER, CATEGORICAL
 
 DATABASE_URL = 'postgresql://backend:backend123@zpi.zgrate.ovh:5035/recommendation-system'
@@ -62,7 +59,7 @@ def process():
 
       print("Posting offer")
       setattr(model, "price", predictedPrice)
-      setattr(model, "priceSource", "ML")
+      setattr(model, "priceSource", "ml")
 
     session.commit()
     session.close()

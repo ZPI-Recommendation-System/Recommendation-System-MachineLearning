@@ -4,7 +4,6 @@ from sqlalchemy.orm import sessionmaker
 
 from queries import all_laptops
 from to_x import to_x
-import pandas as pd
 from collections import defaultdict
 from fields import NUMBER, CATEGORICAL, CATEGORICAL_MULTI
 import pickle
