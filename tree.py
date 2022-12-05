@@ -9,7 +9,7 @@ from imblearn.under_sampling import RandomUnderSampler, ClusterCentroids, NearMi
 import pandas as pd
 import pickle
 
-DATA_FROM_DB = False
+DATA_FROM_DB = True
 
 if DATA_FROM_DB:
    from download import get_data

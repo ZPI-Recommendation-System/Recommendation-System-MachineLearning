@@ -44,8 +44,8 @@ def get_data(floor_price=True):
 
     for row in all_laptops(session).all():
         if row.ModelEntity.priceSource != 'allegro':
-            # skip laptops without scaped price
-            continue        
+            # skip laptops without scraped price
+            continue
         
         price = row.ModelEntity.price
         if floor_price:
@@ -72,14 +72,14 @@ def get_data(floor_price=True):
                 target = getattr(row, table)
                 new_row[field] = getattr(target, field)
                 key_to_classes(field, target, fields_classes)
-        for table, fields in CATEGORICAL_MULTI.items():
-            for field, classes in fields.items():
-                target = getattr(row, table)
-                value = [str(element) for element in getattr(target, field)]
-                new_row[field] = value
-                for element in value:
-                    if type(classes) != list or element in classes:
-                        key_to_classes(field, row, fields_classes, element)
+        # for table, fields in CATEGORICAL_MULTI.items():
+        #     for field, classes in fields.items():
+        #         target = getattr(row, table)
+        #         value = [str(element) for element in getattr(target, field)]
+        #         new_row[field] = value
+        #         for element in value:
+        #             if type(classes) != list or element in classes:
+        #                 key_to_classes(field, row, fields_classes, element)
         X_pre.append(new_row)
 
     print("Converting to X")

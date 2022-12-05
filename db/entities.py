@@ -157,8 +157,8 @@ class ModelEntity(Base):
     multimedia_entity = relationship('MultimediaEntity', secondary='model_entity_multimedia_multimedia_entity')
     model_img_entity = relationship('ModelImgEntity', secondary='model_entity_images_model_img_entity')
 
-    connections: Mapped[list[ConnectionEntity]] = relationship("ConnectionEntity", secondary=t_model_entity_connections_connection_entity, viewonly=True)
-    communications: Mapped[list[CommunicationEntity]] = relationship("CommunicationEntity", secondary=t_model_entity_communications_communication_entity, viewonly=True)
+    # connections: Mapped[list[ConnectionEntity]] = relationship("ConnectionEntity", secondary=t_model_entity_connections_connection_entity, viewonly=True)
+    # communications: Mapped[list[CommunicationEntity]] = relationship("CommunicationEntity", secondary=t_model_entity_communications_communication_entity, viewonly=True)
     # controls: Mapped[list[ControlEntity]] = relationship("ControlEntity", secondary=t_model_entity_controls_control_entity, viewonly=True)
     # multimedia: Mapped[list[MultimediaEntity]] = relationship("MultimediaEntity", secondary=t_model_entity_multimedia_multimedia_entity, viewonly=True)
     # drives: Mapped[list[DriveTypeEntity]] = relationship("DriveTypeEntity", secondary=t_model_entity_drives_drive_type_entity, viewonly=True)

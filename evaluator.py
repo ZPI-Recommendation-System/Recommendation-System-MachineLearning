@@ -35,8 +35,9 @@ def process():
     print("Starting the query")
 
     for row in all_laptops(session).limit(10).all():
-
-      # TOOD: refactor
+      if row.ModelEntity.priceSource == 'allegro':
+         # skip laptops with already scraped price
+         continue
       new_row = {}
       for table, fields in NUMBER.items():
          for field in fields:
@@ -60,8 +61,8 @@ def process():
       print(predictedPrice)
 
       print("Posting offer")
-      newOffer = OfferEntity(offerName="ML", offerURL="ML", offerPrice=predictedPrice, modelId=row.ModelEntity.id)
-      session.add(newOffer)   
+      setattr(model, "price", predictedPrice)
+      setattr(model, "priceSource", "ML")
 
     session.commit()
     session.close()
