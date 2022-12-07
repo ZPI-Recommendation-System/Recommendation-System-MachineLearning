@@ -1,7 +1,6 @@
 import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from db.entities import OfferEntity
 
 from queries import all_laptops
 from to_x import to_x
@@ -26,17 +25,15 @@ def process():
     print("Starting the query")
 
     for row in all_laptops(session).all():
-        # skip macbooks for now
-        name = row.ModelEntity.name.lower()
-        if "macbook" in name or "apple" in name:
-            continue
 
-        price.append(row.OfferEntity.offerPrice)
+        price.append(row.ModelEntity.price)
         processor.append((row.ProcessorEntity.benchmark_entity and row.ProcessorEntity.benchmark_entity.benchmark) or 0)
         graphics.append((row.GraphicsEntity and row.GraphicsEntity.benchmark_entity and row.GraphicsEntity.benchmark_entity.benchmark) or 0)
 
     plt.scatter(processor, price, c=graphics, cmap='viridis')
-    plt.colorbar()
+    plt.colorbar(label="Graphics")
+    plt.xlabel("Processor")
+    plt.ylabel("Price")
     plt.show()
         
 if __name__ == '__main__':
