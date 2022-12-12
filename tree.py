@@ -10,38 +10,42 @@ import pickle
 
 DATA_FROM_DB = True
 
-if DATA_FROM_DB:
-   from download import get_data
+def process():
+   if DATA_FROM_DB:
+      from download import get_data
 
-   data = get_data()
-   with open("data.bin", "wb") as f:
-      pickle.dump(data, f)
-else:
-   with open("data.bin", "rb") as f:
-      data = pickle.load(f)
-   print("Data loaded from file")
+      data = get_data()
+      with open("data.bin", "wb") as f:
+         pickle.dump(data, f)
+   else:
+      with open("data.bin", "rb") as f:
+         data = pickle.load(f)
+      print("Data loaded from file")
 
-X, Y, fields_classes = data
+   X, Y, fields_classes = data
 
-# remove one laptop with price of 10_000
-l = [(x, y) for x, y in zip(X, Y) if y!=10000.0]
-X, Y = list(zip(*l))
+   # remove one laptop with price of 10_000
+   l = [(x, y) for x, y in zip(X, Y) if y!=10000.0]
+   X, Y = list(zip(*l))
 
-X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.4, random_state=0)
+   X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.4, random_state=0)
 
-new_X, new_Y = ADASYN(sampling_strategy='minority').fit_resample(X_train, y_train)
+   new_X, new_Y = ADASYN(sampling_strategy='minority').fit_resample(X_train, y_train)
 
-print("RandomForestClassifier")
+   print("RandomForestClassifier")
 
-# classifier = RandomForestClassifier(random_state=0)
-classifier =  Pipeline([('Normalizing',MinMaxScaler()),('RandomForestClassifier',RandomForestClassifier(random_state=0))])
-classifier.fit(new_X, new_Y)
-score = classifier.score(X_test, y_test)
+   # classifier = RandomForestClassifier(random_state=0)
+   classifier =  Pipeline([('Normalizing',MinMaxScaler()),('RandomForestClassifier',RandomForestClassifier(random_state=0))])
+   classifier.fit(new_X, new_Y)
+   score = classifier.score(X_test, y_test)
 
-print("Accuracy:", score)
+   print("Accuracy:", score)
 
-with open("model.bin", "wb") as f:
-   pickle.dump(classifier, f)
+   with open("model.bin", "wb") as f:
+      pickle.dump(classifier, f)
 
-with open("classes.bin", "wb") as f:
-   pickle.dump(fields_classes, f)
+   with open("classes.bin", "wb") as f:
+      pickle.dump(fields_classes, f)
+
+if __name__ == "__main__":
+   process()
