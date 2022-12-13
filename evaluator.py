@@ -1,3 +1,5 @@
+import os
+
 import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -6,7 +8,7 @@ from queries import all_laptops
 from to_x import to_x
 from fields import NUMBER, CATEGORICAL
 
-DATABASE_URL = 'postgresql://backend:backend123@zpi.zgrate.ovh:5035/recommendation-system'
+DATABASE_URL = f"'postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASS')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_DB')}"
 
 import pickle
 

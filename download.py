@@ -12,8 +12,6 @@ import pickle
 
 DATABASE_URL = f"'postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASS')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_DB')}"
 
-#               'postgresql://backend:backend123@zpi.zgrate.ovh:5035/recommendation-system'
-
 def force_float(value):
     try:
         return float(value)
