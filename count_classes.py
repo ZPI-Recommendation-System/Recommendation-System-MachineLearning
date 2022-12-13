@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 # import sessionmaker
 from sqlalchemy.orm import sessionmaker
 
-DATABASE_URL = f"'postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASS')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_DB')}"
+DATABASE_URL = f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASS')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_DB')}"
 engine = create_engine(DATABASE_URL)
 engine.connect()
 Session = sessionmaker(bind=engine)

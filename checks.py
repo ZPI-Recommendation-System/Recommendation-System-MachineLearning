@@ -12,7 +12,7 @@ from fields import NUMBER, CATEGORICAL
 import matplotlib.pyplot as plt
 plt.style.use('seaborn-whitegrid')
 
-DATABASE_URL = f"'postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASS')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_DB')}"
+DATABASE_URL = f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASS')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_DB')}"
 
 def process():
     processor = []
