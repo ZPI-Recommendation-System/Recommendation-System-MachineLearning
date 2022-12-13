@@ -33,7 +33,7 @@ def process():
     
     print("Starting the query")
 
-    for row in all_laptops(session).limit(10).all():
+    for row in all_laptops(session).all():
       if row.ModelEntity.priceSource == 'allegro':
          # skip laptops with already scraped price
          continue
