@@ -30,7 +30,7 @@ def key_to_classes(key, row, fields_classes: defaultdict[list], value: any = Non
         classes.append(value)
         return len(classes)-1
 
-def get_data(floor_price=True):
+def get_data(round_price=True):
     engine = create_engine(DATABASE_URL)
     engine.connect()
     Session = sessionmaker(bind=engine)
@@ -58,7 +58,7 @@ def get_data(floor_price=True):
             continue        
         
         price = row.ModelEntity.price
-        if floor_price:
+        if round_price:
             # round instead of floor should yield better results
             price = round(price / 1000) * 1000
         

@@ -6,7 +6,7 @@ from queries import all_laptops
 from to_x import to_x
 from collections import defaultdict
 from fields import NUMBER, CATEGORICAL, CATEGORICAL_MULTI
-import pickle
+import utils
 
 DATABASE_URL = 'postgresql://backend:backend123@zpi.zgrate.ovh:5035/recommendation-system'
 
@@ -71,6 +71,7 @@ def get_data(floor_price=True):
                 target = getattr(row, table)
                 new_row[field] = getattr(target, field)
                 key_to_classes(field, target, fields_classes)
+        # this data took long to collect and didn't improve the results
         # for table, fields in CATEGORICAL_MULTI.items():
         #     for field, classes in fields.items():
         #         target = getattr(row, table)
@@ -88,17 +89,22 @@ def get_data(floor_price=True):
     del X_pre
 
     session.close()
-
     
     print("Saving index_to_field")    
 
-    with open("index_to_field.bin", "wb") as f:
-      pickle.dump(index_to_field, f)
+    utils.save(index_to_field, "index_to_field.bin")
+
+    data = (X, Y, fields_classes)
+
+    print("Saving data")
+
+    utils.save(data, "data.bin")
 
     print("Returning data")
 
-    return (X, Y, fields_classes)
+    return data
 
 
 if __name__ == "__main__":
+    print("Field classes: ")
     print(get_data()[2])
