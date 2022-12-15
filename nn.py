@@ -8,21 +8,20 @@ import torch.nn as nn
 import matplotlib.pyplot as plt
 from pathlib import Path
 
+import utils
+
 # create directory models if it doesn't exist using Path module
 Path("models").mkdir(parents=True, exist_ok=True)
 
 DATA_FROM_DB = False
 
 if DATA_FROM_DB:
-   from download import get_data
+    from download import get_data
 
-   data = get_data(floor_price=False)
-   with open("data.bin", "wb") as f:
-      pickle.dump(data, f)
+    data = get_data()
 else:
-   with open("data.bin", "rb") as f:
-      data = pickle.load(f)
-   print("Data loaded from file")
+    data = utils.load("data.bin")
+    print("Data loaded from file")
 
 X, Y, fields_classes = data
 
@@ -30,7 +29,7 @@ X, Y, fields_classes = data
 l = [(x, y) for x, y in zip(X, Y) if y!=10000.0]
 X, Y = list(zip(*l))
 
-X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.4, random_state=0)
+X_train, X_test, y_train, y_test = utils.train_test_split(X, Y)
 y_test = [[y] for y in y_test]
 y_train = [[y] for y in y_train]
 
@@ -71,17 +70,17 @@ Y_train_tensor = torch.tensor(y_train, dtype=torch.float)
 X_test_tensor = torch.tensor(X_test, dtype=torch.float)
 Y_test_tensor = torch.tensor(y_test, dtype=torch.float)
 
-def calculate_accuracy(model):
+def calculate_accuracy(given_x, expected_y, model):
     # Forward and backward passes
     with torch.no_grad():
-        output = model.forward(X_test_tensor)
+        output = model.forward(given_x)
     
     # print("output:", output[0:3])
     output_floored = torch.round(output / 1000) * 1000
-    y_test_floored = torch.round(Y_test_tensor / 1000) * 1000
+    expected_y_floored = torch.round(expected_y / 1000) * 1000
     # print("output_floored", output_floored[0:3])
-    # print("y_test_floored", y_test_floored[0:3])
-    accuracy = sum(y_test_floored == output_floored)/len(Y_test_tensor)
+    # print("y_test_floored", expected_y_floored[0:3])
+    accuracy = sum(expected_y_floored == output_floored)/len(expected_y_floored)
     accuracy = accuracy.item()
     return accuracy
 
@@ -107,7 +106,7 @@ try:
         losses.append(loss.item())
 
         if (t+1) % iterations_to_accuracy == 0:
-            accuracy = calculate_accuracy(model)
+            accuracy = calculate_accuracy(X_test_tensor, Y_test_tensor, model)
             print("accuracy", accuracy)
             accuracies.append(accuracy)
 
@@ -122,6 +121,13 @@ try:
         optimizer.step()
 except KeyboardInterrupt:
     print("KeyboardInterrupt")
+
+X_verify, y_verify = utils.verify_split(X, Y)
+X_verify = torch.tensor(X_verify, dtype=torch.float)
+y_verify = torch.tensor([[y] for y in y_verify], dtype=torch.float)
+
+accuracy = calculate_accuracy(X_verify, y_verify, model)
+print("verif accuracy", accuracy)
 
 # ignore values from before 1000 for better display
 losses = losses[1000:]
