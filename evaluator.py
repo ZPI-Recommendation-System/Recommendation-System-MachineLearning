@@ -57,9 +57,9 @@ def process():
       X = to_x([new_row], index_to_field, fields_classes)
 
       predictedPrice = model.predict(X)[0]
-      print(predictedPrice)
+      # print(predictedPrice)
 
-      print("Posting offer")
+      # print("Posting offer")
       setattr(model, "price", predictedPrice)
       setattr(model, "priceSource", "ml")
 
