@@ -1,3 +1,5 @@
+import os
+
 from queries import counts_connections, counts_communications, counts_controls, counts_multimedia, counts_drives
 
 # create sqlalachemy session 
@@ -5,7 +7,7 @@ from sqlalchemy import create_engine
 # import sessionmaker
 from sqlalchemy.orm import sessionmaker
 
-DATABASE_URL = 'postgresql://backend:backend123@zpi.zgrate.ovh:5035/recommendation-system'
+DATABASE_URL = f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASS')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_DB')}"
 engine = create_engine(DATABASE_URL)
 engine.connect()
 Session = sessionmaker(bind=engine)
