@@ -11,7 +11,7 @@ import numpy as np
 
 import utils
 
-DATA_FROM_DB = False
+DATA_FROM_DB = True
 MODEL = "forest"
 
 def make_model(model_type):
