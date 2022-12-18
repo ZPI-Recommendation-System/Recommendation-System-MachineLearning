@@ -7,6 +7,7 @@ from sklearn.pipeline import make_pipeline
 
 from imblearn.over_sampling import SMOTE, ADASYN
 from imblearn.under_sampling import RandomUnderSampler, ClusterCentroids, NearMiss
+import numpy as np
 
 import utils
 
@@ -35,14 +36,33 @@ def process():
       print("Data loaded from file")
 
    X, Y, fields_classes = data
-
+   
    # remove one laptop with price of 10_000
-   l = [(x, y) for x, y in zip(X, Y) if y!=10000.0]
-   X, Y = list(zip(*l))
+
+   def count_iterable(iterable):
+      return sum(1 for _ in iterable)
+   
+   def filter_same(iterable, value):
+      return filter(lambda x: x==value, iterable)
 
    X_train, X_test, y_train, y_test = utils.training_split(X, Y)
+   
+   counts = dict(
+               (y, count_iterable(filter_same(y_train, y)))
+               for y in y_train)
+   
+   adasyn_min_samples = 3
+   for_adasyn = [(x, y) for x, y in zip(X, y_train) if counts[y]>adasyn_min_samples]
+   # classes with less than 3 samples would be rejected by adasyn
+   adasyn_rejected = [(x, y) for x, y in zip(X, y_train) if counts[y]<=adasyn_min_samples]
+   X_train, y_train = list(zip(*for_adasyn))
 
    new_X, new_Y = ADASYN(sampling_strategy='minority').fit_resample(X_train, y_train)
+
+   # add rejected samples back to the training dataset
+   X_no_adasyn, y_no_adasyn = list(zip(*adasyn_rejected))
+   new_X = np.append(new_X, X_no_adasyn, axis=0)
+   new_Y = np.append(new_Y, y_no_adasyn, axis=0)
 
    classifier = make_model(MODEL)
    classifier.fit(new_X, new_Y)

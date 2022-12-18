@@ -25,15 +25,18 @@ def process():
     print("Starting the query")
 
     for row in all_laptops(session).all():
+        if row.ModelEntity.priceSource != 'allegro':
+            # skip laptops without scraped price
+            continue
 
         price.append(row.ModelEntity.price)
         processor.append((row.ProcessorEntity.benchmark_entity and row.ProcessorEntity.benchmark_entity.benchmark) or 0)
         graphics.append((row.GraphicsEntity and row.GraphicsEntity.benchmark_entity and row.GraphicsEntity.benchmark_entity.benchmark) or 0)
 
     plt.scatter(processor, price, c=graphics, cmap='viridis')
-    plt.colorbar(label="Graphics")
-    plt.xlabel("Processor")
-    plt.ylabel("Price")
+    plt.colorbar(label="Wynik benchmarku GPU")
+    plt.xlabel("Wynik benchmarku CPU")
+    plt.ylabel("Cena")
     plt.show()
         
 if __name__ == '__main__':

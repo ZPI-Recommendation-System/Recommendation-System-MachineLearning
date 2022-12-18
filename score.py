@@ -15,12 +15,13 @@ from sklearn.feature_extraction.text import CountVectorizer
 import matplotlib.pyplot as plt
 import random
 import numpy as np
+import utils
 
 from collections import Counter
 
 DATABASE_URL = 'postgresql://backend:backend123@zpi.zgrate.ovh:5035/recommendation-system'
 
-import utils
+USE_VERIF = False
 
 fields_classes = utils.load("classes.bin")
 model = utils.load("model.bin")
@@ -33,7 +34,11 @@ def random_reading():
    return random.randint(1, 10) * 1000
 
 def process():
-      X_verify, y_verify = utils.verify_split(X, Y)
+      if USE_VERIF:
+         X_verify, y_verify = utils.verify_split(X, Y)
+      else:
+         X_verify = X
+         y_verify = Y
       
       pred = model.predict(X_verify)
       # random prediction
