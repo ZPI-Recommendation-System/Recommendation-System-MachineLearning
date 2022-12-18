@@ -36,8 +36,6 @@ def process():
       print("Data loaded from file")
 
    X, Y, fields_classes = data
-   
-   # remove one laptop with price of 10_000
 
    def count_iterable(iterable):
       return sum(1 for _ in iterable)
@@ -60,9 +58,10 @@ def process():
    new_X, new_Y = ADASYN(sampling_strategy='minority').fit_resample(X_train, y_train)
 
    # add rejected samples back to the training dataset
-   X_no_adasyn, y_no_adasyn = list(zip(*adasyn_rejected))
-   new_X = np.append(new_X, X_no_adasyn, axis=0)
-   new_Y = np.append(new_Y, y_no_adasyn, axis=0)
+   if adasyn_rejected:
+      X_no_adasyn, y_no_adasyn = list(zip(*adasyn_rejected))
+      new_X = np.append(new_X, X_no_adasyn, axis=0)
+      new_Y = np.append(new_Y, y_no_adasyn, axis=0)
 
    classifier = make_model(MODEL)
    classifier.fit(new_X, new_Y)
